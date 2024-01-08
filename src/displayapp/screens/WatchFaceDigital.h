@@ -49,6 +49,7 @@ namespace Pinetime {
         using days = std::chrono::duration<int32_t, std::ratio<86400>>; // TODO: days is standard in c++20
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, days>> currentDate;
 
+        lv_obj_t* batteryValue;
         lv_obj_t* label_time;
         lv_obj_t* label_time_ampm;
         lv_obj_t* label_date;
@@ -57,6 +58,7 @@ namespace Pinetime {
         lv_obj_t* notificationIcon;
 
         Controllers::DateTime& dateTimeController;
+        const Controllers::Battery& batteryController;
         Controllers::NotificationManager& notificationManager;
         Controllers::Settings& settingsController;
         Controllers::MotionController& motionController;

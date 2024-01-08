@@ -20,12 +20,16 @@ WatchFaceDigital::WatchFaceDigital(Controllers::DateTime& dateTimeController,
                                    Controllers::MotionController& motionController)
   : currentDateTime {{}},
     dateTimeController {dateTimeController},
+    batteryController {batteryController},
     notificationManager {notificationManager},
     settingsController {settingsController},
     motionController {motionController},
     statusIcons(batteryController, bleController) {
 
   statusIcons.Create();
+
+  batteryValue = lv_label_create(lv_scr_act(), nullptr);
+  lv_obj_align(batteryValue, lv_scr_act(), LV_ALIGN_IN_TOP_MID, 0, 0);
 
   notificationIcon = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_style_local_text_color(notificationIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_LIME);
@@ -70,6 +74,12 @@ void WatchFaceDigital::Refresh() {
   notificationState = notificationManager.AreNewNotificationsAvailable();
   if (notificationState.IsUpdated()) {
     lv_label_set_text_static(notificationIcon, NotificationIcon::GetIcon(notificationState.Get()));
+  }
+
+  powerPresent = batteryController.IsPowerPresent();
+  batteryPercentRemaining = batteryController.PercentRemaining();
+  if (batteryPercentRemaining.IsUpdated() || powerPresent.IsUpdated()) {
+    lv_label_set_text_fmt(batteryValue, "%d%%%", batteryPercentRemaining.Get());
   }
 
   currentDateTime = std::chrono::time_point_cast<std::chrono::minutes>(dateTimeController.CurrentDateTime());
