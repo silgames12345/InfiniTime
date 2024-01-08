@@ -17,7 +17,6 @@ namespace Pinetime {
     class Battery;
     class Ble;
     class NotificationManager;
-    class HeartRateController;
     class MotionController;
   }
 
@@ -31,7 +30,6 @@ namespace Pinetime {
                          const Controllers::Ble& bleController,
                          Controllers::NotificationManager& notificationManager,
                          Controllers::Settings& settingsController,
-                         Controllers::HeartRateController& heartRateController,
                          Controllers::MotionController& motionController);
         ~WatchFaceDigital() override;
 
@@ -47,8 +45,6 @@ namespace Pinetime {
         Utility::DirtyValue<bool> bleRadioEnabled {};
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, std::chrono::minutes>> currentDateTime {};
         Utility::DirtyValue<uint32_t> stepCount {};
-        Utility::DirtyValue<uint8_t> heartbeat {};
-        Utility::DirtyValue<bool> heartbeatRunning {};
         Utility::DirtyValue<bool> notificationState {};
         using days = std::chrono::duration<int32_t, std::ratio<86400>>; // TODO: days is standard in c++20
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, days>> currentDate;
@@ -56,8 +52,6 @@ namespace Pinetime {
         lv_obj_t* label_time;
         lv_obj_t* label_time_ampm;
         lv_obj_t* label_date;
-        lv_obj_t* heartbeatIcon;
-        lv_obj_t* heartbeatValue;
         lv_obj_t* stepIcon;
         lv_obj_t* stepValue;
         lv_obj_t* notificationIcon;
@@ -65,7 +59,6 @@ namespace Pinetime {
         Controllers::DateTime& dateTimeController;
         Controllers::NotificationManager& notificationManager;
         Controllers::Settings& settingsController;
-        Controllers::HeartRateController& heartRateController;
         Controllers::MotionController& motionController;
 
         lv_task_t* taskRefresh;
@@ -84,7 +77,6 @@ namespace Pinetime {
                                              controllers.bleController,
                                              controllers.notificationManager,
                                              controllers.settingsController,
-                                             controllers.heartRateController,
                                              controllers.motionController);
       };
 
