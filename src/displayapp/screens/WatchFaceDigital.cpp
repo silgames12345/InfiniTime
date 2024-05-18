@@ -2,15 +2,12 @@
 
 #include <lvgl/lvgl.h>
 #include <cstdio>
-#include <lvgl/src/lv_core/lv_obj.h>
 #include "displayapp/screens/NotificationIcon.h"
 #include "displayapp/screens/Symbols.h"
-#include "displayapp/screens/WeatherSymbols.h"
 #include "components/battery/BatteryController.h"
 #include "components/ble/BleController.h"
 #include "components/ble/NotificationManager.h"
 #include "components/motion/MotionController.h"
-#include "components/ble/SimpleWeatherService.h"
 #include "components/settings/Settings.h"
 
 using namespace Pinetime::Applications::Screens;
@@ -20,33 +17,16 @@ WatchFaceDigital::WatchFaceDigital(Controllers::DateTime& dateTimeController,
                                    const Controllers::Ble& bleController,
                                    Controllers::NotificationManager& notificationManager,
                                    Controllers::Settings& settingsController,
-                                   Controllers::MotionController& motionController,
-                                   Controllers::SimpleWeatherService& weatherService)
+                                   Controllers::MotionController& motionController)
   : currentDateTime {{}},
     dateTimeController {dateTimeController},
     batteryController {batteryController},
     notificationManager {notificationManager},
     settingsController {settingsController},
     motionController {motionController},
-    weatherService {weatherService},
     statusIcons(batteryController, bleController) {
 
   statusIcons.Create();
-
-  weatherIcon = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_style_local_text_color(weatherIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-  lv_obj_set_style_local_text_font(weatherIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &fontawesome_weathericons);
-  lv_label_set_text(weatherIcon, "");
-  lv_obj_align(weatherIcon, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
-  lv_obj_set_auto_realign(weatherIcon, true);
-  lv_obj_set_hidden(weatherIcon, false);
-
-  temperature = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_style_local_text_color(temperature, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-  lv_label_set_text(temperature, "");
-  lv_obj_align(temperature, nullptr, LV_ALIGN_IN_BOTTOM_MID, 40, 0);
-
-
 
   batteryValue = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_align(batteryValue, lv_scr_act(), LV_ALIGN_IN_TOP_MID, 0, 0);
@@ -90,27 +70,6 @@ WatchFaceDigital::~WatchFaceDigital() {
 
 void WatchFaceDigital::Refresh() {
   statusIcons.Update();
-
-  currentWeather = weatherService.Current();
-  if (currentWeather.IsUpdated()) {
-    auto optCurrentWeather = currentWeather.Get();
-    if (optCurrentWeather) {
-      int16_t temp = optCurrentWeather->temperature;
-      char tempUnit = 'C';
-      if (settingsController.GetWeatherFormat() == Controllers::Settings::WeatherFormat::Imperial) {
-        temp = Controllers::SimpleWeatherService::CelsiusToFahrenheit(temp);
-        tempUnit = 'F';
-      }
-      temp = temp / 100 + (temp % 100 >= 50 ? 1 : 0);
-      lv_label_set_text_fmt(temperature, "%d°%c", temp, tempUnit);
-      lv_label_set_text(weatherIcon, Symbols::GetSymbol(optCurrentWeather->iconId));
-    } else {
-      lv_label_set_text_static(temperature, "");
-      lv_label_set_text(weatherIcon, "");
-    }
-    lv_obj_realign(temperature);
-    lv_obj_realign(weatherIcon);
-  }
 
   notificationState = notificationManager.AreNewNotificationsAvailable();
   if (notificationState.IsUpdated()) {
