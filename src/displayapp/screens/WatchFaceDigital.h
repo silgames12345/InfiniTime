@@ -18,7 +18,6 @@ namespace Pinetime {
     class Battery;
     class Ble;
     class NotificationManager;
-    class HeartRateController;
     class MotionController;
   }
 
@@ -45,18 +44,15 @@ namespace Pinetime {
 
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, std::chrono::minutes>> currentDateTime {};
         Utility::DirtyValue<uint32_t> stepCount {};
-        Utility::DirtyValue<uint8_t> heartbeat {};
-        Utility::DirtyValue<bool> heartbeatRunning {};
         Utility::DirtyValue<bool> notificationState {};
         Utility::DirtyValue<std::optional<Pinetime::Controllers::SimpleWeatherService::CurrentWeather>> currentWeather {};
 
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, std::chrono::days>> currentDate;
 
+        lv_obj_t* batteryValue;
         lv_obj_t* label_time;
         lv_obj_t* label_time_ampm;
         lv_obj_t* label_date;
-        lv_obj_t* heartbeatIcon;
-        lv_obj_t* heartbeatValue;
         lv_obj_t* stepIcon;
         lv_obj_t* stepValue;
         lv_obj_t* notificationIcon;
@@ -64,9 +60,9 @@ namespace Pinetime {
         lv_obj_t* temperature;
 
         Controllers::DateTime& dateTimeController;
+        const Controllers::Battery& batteryController;
         Controllers::NotificationManager& notificationManager;
         Controllers::Settings& settingsController;
-        Controllers::HeartRateController& heartRateController;
         Controllers::MotionController& motionController;
         Controllers::SimpleWeatherService& weatherService;
 
